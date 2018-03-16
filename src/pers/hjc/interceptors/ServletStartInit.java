@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import pers.hjc.GlobelVariable;
 import pers.hjc.model.IndexImage;
 import pers.hjc.model.IndexPublication;
+import pers.hjc.model.IndexResearch;
 import pers.hjc.model.IndexTeaching;
 import pers.hjc.util.PathUtil;
 import pers.hjc.util.PropUtil;
@@ -96,6 +97,15 @@ public class ServletStartInit extends HttpServlet
 			}
 			application.setAttribute(GlobelVariable.APPLICATION_PUBLICATION_PATH, publications);
 			application.setAttribute(GlobelVariable.APPLICATION_PUBLICATION_SIZE, publications.size());
+			
+			rs = stat.executeQuery("select * from index_teaching WHERE is_use = 1 ORDER BY id desc");
+			List<IndexResearch> researchs = new ArrayList<>();
+			while (rs.next())
+			{
+				researchs.add(new IndexResearch(rs.getLong("id"), rs.getString("content")));
+			}
+			application.setAttribute(GlobelVariable.APPLICATION_RESEARCH_PATH, publications);
+			application.setAttribute(GlobelVariable.APPLICATION_RESEARCH_SIZE, publications.size());
 			
 			System.out.println("application初始化结束");
 		}
