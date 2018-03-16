@@ -1,0 +1,13 @@
+/weekly/src/config.properties.savepath 为图片保存路径
+
+/weekly/webapp/res/ueditor/jsp/config.json 配置查看图片
+
+保存路径如果在项目外 在tomcat server.xml 中添加 <Context docBase="图片保存路径" path="config.json中前缀"/>
+
+路径中要有3个文件夹 head存的头像 indeximage 存的首页图片 image存的周报中的图片	默认已创建 未创建我也懒的自动创建 直接报错
+
+vim ~/.bashrc
+
+ $JAVA_PATH/jre/lib/security/java.security  替换  securerandom.source=file:/dev/random 至 securerandom.source=file:/dev/./urandom
+ 
+ Linux SecureRandom 会很慢
