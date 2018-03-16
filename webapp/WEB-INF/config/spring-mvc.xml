@@ -24,6 +24,7 @@
 			type="annotation"
 			expression="org.springframework.stereotype.Service" />
 	</context:component-scan>
+
 	<!-- 自动注册DefaultAnnotationHandlerMapping与AnnotationMethodHandlerAdapter,可以自己手动注册这两个 -->
 	<mvc:annotation-driven>
 		<!-- 替代AnnotationMethodHandlerAdapter -->
@@ -54,7 +55,9 @@
 	</mvc:interceptors>
 
 	<!-- 静态资源(js/image)的访问 -->
-	<mvc:resources mapping="/res/**" location="/res/" />  
+	<mvc:resources
+		mapping="/res/**"
+		location="/res/" />
 	<!-- 定义视图解析器 InternalResourceViewResolver：用于支持Servlet、JSP视图解析 -->
 	<bean
 		id="viewResolver"
