@@ -1,0 +1,61 @@
+.response h4 {
+    color: #333;
+    font-size: 1.5em;
+    font-weight: 600;
+    margin-bottom: 1.5em;
+}
+.media-left.response-text-left {
+    float: left;
+    width: 19%;
+}
+.response-text-right p {
+    color: #777;
+    font-size:1.1em;
+    margin: 0 0 1em;
+	line-height:1.9em;
+	font-family: 'Open Sans', sans-serif;
+}
+.media-body.response-text-right ul li {
+	margin: 0;
+    padding: 0;
+    color: #F26649;
+    font-size: 1.0em;
+    display: inline-block;
+    font-weight: 400;
+}
+.media-body.response-text-right ul li a {
+    color:#4a245e;
+    font-size: 1em;
+    display: block;
+    margin-top: 6px;
+    margin-left: 2em;
+}
+.media-body.response-text-right {
+    float: right;
+    width: 77%;
+    text-align: left;
+}
+.media-left.response-text-left h5 a {
+    color: #4A245E;
+    font-weight: 400;
+    line-height: 2em;
+}
+
+.media-left.response-text-left a:hover {
+	text-decoration: none;
+}
+.coment-form {
+    margin-top: 2em;
+	padding-bottom:1em;
+}
+.media-left.response-text-left a img {
+    border-radius:50%;
+	-o-border-radius:50%;
+	-webkit-border-radius:50%;
+	-moz-border-radius:50%;
+	-ms-border-radius:50%;
+}
+.media-body.response-text-right ul li a:hover {
+    text-decoration: none;
+    color: #f26649;
+}
