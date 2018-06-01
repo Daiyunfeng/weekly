@@ -98,7 +98,7 @@ public class ServletStartInit extends HttpServlet
 			application.setAttribute(GlobelVariable.APPLICATION_PUBLICATION_PATH, publications);
 			application.setAttribute(GlobelVariable.APPLICATION_PUBLICATION_SIZE, publications.size());
 			
-			rs = stat.executeQuery("select * from index_teaching WHERE is_use = 1 ORDER BY id desc");
+			rs = stat.executeQuery("select * from index_research WHERE is_use = 1 ORDER BY id desc");
 			List<IndexResearch> researchs = new ArrayList<>();
 			while (rs.next())
 			{
