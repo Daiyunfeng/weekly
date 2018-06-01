@@ -46,10 +46,11 @@ import pers.hjc.util.CookieUtils;
 import pers.hjc.util.ErrorUtil;
 import pers.hjc.util.ImageUtil;
 import pers.hjc.util.MD5Util;
+
 /**
- * 用户操作
- * 注册 登陆 修改
- * realname禁止输入'('')''<''>'' ' 如果能解决js 修改input的value时转义问题 也可用XSSUtil.cleanXSS()
+ * 用户操作 注册 登陆 修改 realname禁止输入'('')''<''>'' ' 如果能解决js 修改input的value时转义问题
+ * 也可用XSSUtil.cleanXSS()
+ * 
  * @author Administrator
  *
  */
@@ -64,7 +65,7 @@ public class UserController
 
 	@Autowired
 	private ServletContext servletContext;
-	
+
 	@RequestMapping({ "/login" })
 	@FormToken(produce = true)
 	public String loginPage()
@@ -192,7 +193,7 @@ public class UserController
 				HttpSession session = request.getSession();
 				if (session.getAttribute("captchaToken").toString().toLowerCase().equals(captcha.toLowerCase()))
 				{
-					User user = userService.login(map, loginMessage);
+					User user = userService.login(loginMessage);
 					session.setAttribute(GlobelVariable.SESSION_USER_ID, user.getID());
 					map.put("flag", 1);
 					map.put("role", user.getRole().getID());
@@ -403,16 +404,9 @@ public class UserController
 			// 验证数据
 			validateUser(user);
 			user.setRealname(user.getRealname());
-			Boolean flag = userService.registerUser(user);
-			if (flag)
-			{
-				map.put("flag", 1);
-				session.setAttribute(GlobelVariable.SESSION_USER_ID, user.getID());
-			}
-			else
-			{
-				throw new Exception("注册失败");
-			}
+			userService.registerUser(user);
+			map.put("flag", 1);
+			session.setAttribute(GlobelVariable.SESSION_USER_ID, user.getID());
 		}
 		catch (Exception e)
 		{
@@ -450,15 +444,8 @@ public class UserController
 					}
 					newUser.setPassword(MD5Util.generate(newPassword));
 				}
-				Boolean flag = userService.updateUser(newUser);
-				if (flag)
-				{
-					map.put("flag", 1);
-				}
-				else
-				{
-					throw new Exception("更新失败");
-				}
+				userService.updateUser(newUser);
+				map.put("flag", 1);
 			}
 			else
 			{
@@ -528,11 +515,7 @@ public class UserController
 						String head = "/upload/head/" + uuid + "_s." + prefix;
 						User user = userService.findUser(ID);
 						user.setHead(head);
-						flag = userService.updateUser(user);
-						if (!flag)
-						{
-							throw new Exception("更新头像失败");
-						}
+						userService.updateUser(user);
 						map.put("flag", 1);
 						map.put("res", head);
 					}
@@ -555,7 +538,7 @@ public class UserController
 		}
 		return map;
 	}
-	
+
 	@RequestMapping({ "/findIndexUserAjax" })
 	@ResponseBody
 	public Object findIndexUser(HttpServletRequest request, HttpServletResponse response)
@@ -566,10 +549,10 @@ public class UserController
 			HttpSession session = request.getSession();
 			Object userID = session.getAttribute(GlobelVariable.SESSION_USER_ID);
 			String role = "";
-			if(userID!=null)
+			if (userID != null)
 			{
 				Long ID = Long.parseLong(userID.toString());
-				if(userService.findUser(ID)!=null)
+				if (userService.findUser(ID) != null)
 				{
 					role = userService.findUser(ID).getRole().getDescription();
 				}
@@ -609,10 +592,10 @@ public class UserController
 		{
 			throw new Exception("真实姓名不能为空");
 		}
-		for(int i=0;i<realname.length();i++)
+		for (int i = 0; i < realname.length(); i++)
 		{
 			char c = realname.charAt(i);
-			if(c == ' '||c=='<'||c=='>'||c=='('||c==')')
+			if (c == ' ' || c == '<' || c == '>' || c == '(' || c == ')')
 			{
 				throw new Exception("真实姓名中包含非法字符");
 			}

@@ -19,8 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -48,15 +46,12 @@ import pers.hjc.util.ConfigUtil;
 import pers.hjc.util.ErrorUtil;
 import pers.hjc.util.ImageUtil;
 import pers.hjc.util.MD5Util;
-import pers.hjc.util.StringEscapeEditor;
 import pers.hjc.util.XSSUtil;
+
 /**
- * 管理员操作
- * 修改删除任意人的周报
- * 修改权限 重置密码
- * 对首页信息进行 增删改操作 包括 首页显示的顺序 上下 置顶 置底移动
- * 需要注意使用XSSUtil.cleanXSS()方法将某些特殊字符过滤了
- * 代码中修改后需要reload将信息加载到application中
+ * 管理员操作 修改删除任意人的周报 修改权限 重置密码 对首页信息进行 增删改操作 包括 首页显示的顺序 上下 置顶 置底移动
+ * 需要注意使用XSSUtil.cleanXSS()方法将某些特殊字符过滤了 代码中修改后需要reload将信息加载到application中
+ * 
  * @author Administrator
  *
  */
@@ -67,7 +62,7 @@ public class AdminController
 	private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private ArticleService articleService;
 
@@ -77,12 +72,12 @@ public class AdminController
 	@Autowired
 	private ServletContext servletContext;
 
-	/*@InitBinder
-	private void initBinder(WebDataBinder binder)
-	{  
-		binder.registerCustomEditor(String.class, new StringEscapeEditor(true, false));  
-	}  */
-	
+	/*
+	 * @InitBinder private void initBinder(WebDataBinder binder) {
+	 * binder.registerCustomEditor(String.class, new StringEscapeEditor(true,
+	 * false)); }
+	 */
+
 	@RequestMapping("/updateArticleAjax")
 	@ResponseBody
 	@FormToken(remove = true)
@@ -114,16 +109,9 @@ public class AdminController
 			ArticleContent content = newArticle.getArticleContent();
 			content.setContent(article.getArticleContent().getContent());
 			newArticle.setArticleContent(content);
-			Boolean flag = articleService.updateArticle(newArticle);
-			if (flag)
-			{
-				map.put("flag", 1);
-				map.put("msg", article.getID());
-			}
-			else
-			{
-				throw new Exception("更新失败");
-			}
+			articleService.updateArticle(newArticle);
+			map.put("flag", 1);
+			map.put("msg", article.getID());
 		}
 		catch (Exception e)
 		{
@@ -153,17 +141,9 @@ public class AdminController
 				throw new Exception("文章不存在");
 			}
 
-			article.setIsUse(0);
-			Boolean flag = articleService.updateArticle(article);
-			if (flag)
-			{
-				logger.warn("Delete Ariticle " + articleID + " by " + ID);
-				map.put("flag", 1);
-			}
-			else
-			{
-				throw new Exception("删除失败");
-			}
+			articleService.deleteArticle(article);
+			logger.warn("Delete Ariticle " + articleID + " by " + ID);
+			map.put("flag", 1);
 		}
 		catch (Exception e)
 		{
@@ -196,16 +176,9 @@ public class AdminController
 			}
 			user.setPassword(MD5Util
 					.generate(userID.toString().substring(userID.toString().length() - 6, userID.toString().length())));
-			Boolean flag = userService.updateUser(user);
-			if (flag)
-			{
-				map.put("flag", 1);
-				logger.warn("Reset password " + userID + " by " + ID);
-			}
-			else
-			{
-				throw new Exception("更新失败");
-			}
+			userService.updateUser(user);
+			map.put("flag", 1);
+			logger.warn("Reset password " + userID + " by " + ID);
 		}
 		catch (Exception e)
 		{
@@ -214,7 +187,7 @@ public class AdminController
 		}
 		return map;
 	}
-	
+
 	@RequestMapping("/changeRoleAjax")
 	@ResponseBody
 	public Object changeRole(Long userID, Long roleID, HttpServletRequest request, HttpServletResponse response)
@@ -242,16 +215,9 @@ public class AdminController
 				throw new Exception("此ID被禁用");
 			}
 			user.setRole(role);
-			Boolean flag = userService.updateUser(user);
-			if (flag)
-			{
-				map.put("flag", 1);
-				logger.warn("Change role " + userID + " by " + ID);
-			}
-			else
-			{
-				throw new Exception("修改权限失败");
-			}
+			userService.updateUser(user);
+			map.put("flag", 1);
+			logger.warn("Change role " + userID + " by " + ID);
 		}
 		catch (Exception e)
 		{
@@ -260,8 +226,8 @@ public class AdminController
 		}
 		return map;
 	}
-	
-	///首页展示图片
+
+	/// 首页展示图片
 
 	@RequestMapping("/deleteIndexImageAjax")
 	@ResponseBody
@@ -279,27 +245,20 @@ public class AdminController
 
 			IndexImage deleteImage = adminService.getImageByID(imageID);
 			int orders = deleteImage.getOrders();
-			Boolean flag = adminService.deleteImage(imageID);
+			adminService.deleteImage(imageID);
 
-			if (flag)
+			List<IndexImage> images = adminService.getAllImage();
+			for (IndexImage image : images)
 			{
-				List<IndexImage> images = adminService.getAllImage();
-				for (IndexImage image : images)
+				if (image.getOrders() > orders)
 				{
-					if (image.getOrders() > orders)
-					{
-						image.setOrders(image.getOrders() - 1);
-						adminService.updateImage(image);
-					}
+					image.setOrders(image.getOrders() - 1);
+					adminService.updateImage(image);
 				}
-				loadImage();
-				logger.warn("Delete image " + imageID + " by " + ID);
-				map.put("flag", 1);
 			}
-			else
-			{
-				throw new Exception("删除失败");
-			}
+			loadImage();
+			logger.warn("Delete image " + imageID + " by " + ID);
+			map.put("flag", 1);
 		}
 		catch (Exception e)
 		{
@@ -358,7 +317,7 @@ public class AdminController
 			Long ID = Long.parseLong(session.getAttribute(GlobelVariable.SESSION_USER_ID).toString());
 
 			IndexImage image = adminService.getImageByID(imageID);
-			if(image == null)
+			if (image == null)
 			{
 				throw new Exception("修改图片为空");
 			}
@@ -406,7 +365,7 @@ public class AdminController
 			Long ID = Long.parseLong(session.getAttribute(GlobelVariable.SESSION_USER_ID).toString());
 
 			IndexImage image = adminService.getImageByID(imageID);
-			if(image == null)
+			if (image == null)
 			{
 				throw new Exception("修改图片为空");
 			}
@@ -455,7 +414,7 @@ public class AdminController
 			Long ID = Long.parseLong(session.getAttribute(GlobelVariable.SESSION_USER_ID).toString());
 
 			IndexImage image = adminService.getImageByID(imageID);
-			if(image == null)
+			if (image == null)
 			{
 				throw new Exception("修改图片为空");
 			}
@@ -504,7 +463,7 @@ public class AdminController
 			Long ID = Long.parseLong(session.getAttribute(GlobelVariable.SESSION_USER_ID).toString());
 
 			IndexImage image = adminService.getImageByID(imageID);
-			if(image == null)
+			if (image == null)
 			{
 				throw new Exception("修改图片为空");
 			}
@@ -560,11 +519,7 @@ public class AdminController
 			}
 			saveImage.setTitle(XSSUtil.cleanXSS(image.getTitle()));
 			saveImage.setDescription(image.getDescription());
-			Boolean flag = adminService.updateImage(saveImage);
-			if (!flag)
-			{
-				throw new Exception("更新图片失败");
-			}
+			adminService.updateImage(saveImage);
 			loadImage();
 			logger.warn("Update image " + imageID + " by " + ID);
 			map.put("flag", 1);
@@ -639,11 +594,7 @@ public class AdminController
 						}
 						String path = "/upload/indeximage/" + uuid + "_s." + prefix;
 						saveImage.setImage(path);
-						flag = adminService.updateImage(saveImage);
-						if (!flag)
-						{
-							throw new Exception("更新图片失败");
-						}
+						adminService.updateImage(saveImage);
 						loadImage();
 						logger.warn("Update image " + imageID + " by " + ID);
 						map.put("flag", 1);
@@ -668,8 +619,8 @@ public class AdminController
 		}
 		return map;
 	}
-	
-	///首页展示用户
+
+	/// 首页展示用户
 
 	@RequestMapping("/topUserAjax")
 	@ResponseBody
@@ -684,7 +635,7 @@ public class AdminController
 			}
 
 			IndexUser indexUser = adminService.getIndexUserByID(userID);
-			if(indexUser == null)
+			if (indexUser == null)
 			{
 				throw new Exception("修改数据为空");
 			}
@@ -729,7 +680,7 @@ public class AdminController
 			}
 
 			IndexUser indexUser = adminService.getIndexUserByID(userID);
-			if(indexUser == null)
+			if (indexUser == null)
 			{
 				throw new Exception("修改数据为空");
 			}
@@ -773,9 +724,9 @@ public class AdminController
 			{
 				throw new Exception("修改用户ID为空");
 			}
-	
+
 			IndexUser indexUser = adminService.getIndexUserByID(userID);
-			if(indexUser == null)
+			if (indexUser == null)
 			{
 				throw new Exception("修改数据为空");
 			}
@@ -819,9 +770,9 @@ public class AdminController
 			{
 				throw new Exception("修改用户ID为空");
 			}
-	
+
 			IndexUser indexUser = adminService.getIndexUserByID(userID);
-			if(indexUser == null)
+			if (indexUser == null)
 			{
 				throw new Exception("修改数据为空");
 			}
@@ -852,7 +803,7 @@ public class AdminController
 		}
 		return map;
 	}
-	
+
 	@RequestMapping("/addIndexUserAjax")
 	@ResponseBody
 	public Object addIndexUser(Long userID, HttpServletRequest request, HttpServletResponse response)
@@ -882,7 +833,7 @@ public class AdminController
 		}
 		return map;
 	}
-	
+
 	@RequestMapping("/deleteIndexUserAjax")
 	@ResponseBody
 	public Object deleteIndexUser(Long userID, HttpServletRequest request, HttpServletResponse response)
@@ -899,25 +850,18 @@ public class AdminController
 
 			IndexUser deleteuser = adminService.getIndexUserByID(userID);
 			int orders = deleteuser.getOrders();
-			Boolean flag = adminService.deleteIndexUser(userID);
+			adminService.deleteIndexUser(userID);
 
-			if (flag)
+			List<IndexUser> users = userService.findAllIndexUser();
+			for (IndexUser user : users)
 			{
-				List<IndexUser> users = userService.findAllIndexUser();
-				for (IndexUser user : users)
+				if (user.getOrders() > orders)
 				{
-					if (user.getOrders() > orders)
-					{
-						user.setOrders(user.getOrders() - 1);
-						adminService.updateIndexUser(user);
-					}
+					user.setOrders(user.getOrders() - 1);
+					adminService.updateIndexUser(user);
 				}
-				map.put("flag", 1);
 			}
-			else
-			{
-				throw new Exception("删除失败");
-			}
+			map.put("flag", 1);
 		}
 		catch (Exception e)
 		{
@@ -927,8 +871,8 @@ public class AdminController
 		return map;
 	}
 
-	///首页教学经历
-	
+	/// 首页教学经历
+
 	@RequestMapping("/addTeachingAjax")
 	@ResponseBody
 	public Object addTeaching(IndexTeaching teaching, HttpServletRequest request, HttpServletResponse response)
@@ -940,7 +884,7 @@ public class AdminController
 			{
 				throw new Exception("添加教学记录为空");
 			}
-			if(teaching.getContent()==null||teaching.getContent().trim().equals(""))
+			if (teaching.getContent() == null || teaching.getContent().trim().equals(""))
 			{
 				throw new Exception("教学记录内容不能为空");
 			}
@@ -949,7 +893,7 @@ public class AdminController
 
 			teaching.setContent(XSSUtil.cleanXSS(teaching.getContent()));
 			Long teachingID = adminService.addIndexTeaching(teaching);
-			if (teachingID!=null)
+			if (teachingID != null)
 			{
 				logger.warn("Add teaching " + teachingID + " by " + ID);
 				loadTeaching();
@@ -967,7 +911,7 @@ public class AdminController
 		}
 		return map;
 	}
-	
+
 	@RequestMapping("/updateTeachingAjax")
 	@ResponseBody
 	public Object updateTeaching(IndexTeaching teaching, HttpServletRequest request, HttpServletResponse response)
@@ -979,7 +923,7 @@ public class AdminController
 			{
 				throw new Exception("更新教学记录为空");
 			}
-			if(teaching.getContent()==null||teaching.getContent().trim().equals(""))
+			if (teaching.getContent() == null || teaching.getContent().trim().equals(""))
 			{
 				throw new Exception("教学记录内容不能为空");
 			}
@@ -989,17 +933,10 @@ public class AdminController
 			Long teachingID = teaching.getID();
 			IndexTeaching newTeaching = adminService.getTeachingByID(teachingID);
 			newTeaching.setContent(XSSUtil.cleanXSS(teaching.getContent()));
-			Boolean flag = adminService.updateIndexTeaching(newTeaching);
-			if (flag)
-			{
-				logger.warn("Update teaching " + teachingID + " by " + ID);
-				loadTeaching();
-				map.put("flag", 1);
-			}
-			else
-			{
-				throw new Exception("删除失败");
-			}
+			adminService.updateIndexTeaching(newTeaching);
+			logger.warn("Update teaching " + teachingID + " by " + ID);
+			loadTeaching();
+			map.put("flag", 1);
 		}
 		catch (Exception e)
 		{
@@ -1008,7 +945,7 @@ public class AdminController
 		}
 		return map;
 	}
-	
+
 	@RequestMapping("/deleteTeachingAjax")
 	@ResponseBody
 	public Object deleteTeaching(Long teachingID, HttpServletRequest request, HttpServletResponse response)
@@ -1023,17 +960,10 @@ public class AdminController
 			HttpSession session = request.getSession();
 			Long ID = Long.parseLong(session.getAttribute(GlobelVariable.SESSION_USER_ID).toString());
 
-			Boolean flag = adminService.deleteIndexTeaching(teachingID);
-			if (flag)
-			{
-				logger.warn("Delete teaching " + teachingID + " by " + ID);
-				loadTeaching();
-				map.put("flag", 1);
-			}
-			else
-			{
-				throw new Exception("删除失败");
-			}
+			adminService.deleteIndexTeaching(teachingID);
+			logger.warn("Delete teaching " + teachingID + " by " + ID);
+			loadTeaching();
+			map.put("flag", 1);
 		}
 		catch (Exception e)
 		{
@@ -1042,9 +972,9 @@ public class AdminController
 		}
 		return map;
 	}
-	
-	///首页发表
-	
+
+	/// 首页发表
+
 	@RequestMapping("/addPublicationAjax")
 	@ResponseBody
 	public Object addPublication(IndexPublication publication, HttpServletRequest request, HttpServletResponse response)
@@ -1056,7 +986,7 @@ public class AdminController
 			{
 				throw new Exception("添加论文记录为空");
 			}
-			if(publication.getContent()==null||publication.getContent().trim().equals(""))
+			if (publication.getContent() == null || publication.getContent().trim().equals(""))
 			{
 				throw new Exception("详情不能为空");
 			}
@@ -1065,7 +995,7 @@ public class AdminController
 
 			publication.setContent(XSSUtil.cleanXSS(publication.getContent()));
 			Long publicationID = adminService.addIndexPublication(publication);
-			if (publicationID!=null)
+			if (publicationID != null)
 			{
 				logger.warn("Add publication " + publicationID + " by " + ID);
 				loadPublication();
@@ -1083,10 +1013,11 @@ public class AdminController
 		}
 		return map;
 	}
-	
+
 	@RequestMapping("/updatePublicationAjax")
 	@ResponseBody
-	public Object updatePublication(IndexPublication publication, HttpServletRequest request, HttpServletResponse response)
+	public Object updatePublication(IndexPublication publication, HttpServletRequest request,
+			HttpServletResponse response)
 	{
 		Map<String, Object> map = new HashMap<>();
 		try
@@ -1095,7 +1026,7 @@ public class AdminController
 			{
 				throw new Exception("更新论文记录为空");
 			}
-			if(publication.getContent()==null||publication.getContent().trim().equals(""))
+			if (publication.getContent() == null || publication.getContent().trim().equals(""))
 			{
 				throw new Exception("详情不能为空");
 			}
@@ -1105,17 +1036,10 @@ public class AdminController
 			Long publicationID = publication.getID();
 			IndexPublication newPublication = adminService.getPublicationByID(publicationID);
 			newPublication.setContent(XSSUtil.cleanXSS(publication.getContent()));
-			Boolean flag = adminService.updateIndexPublication(newPublication);
-			if (flag)
-			{
-				logger.warn("Update publication " + publicationID + " by " + ID);
-				loadPublication();
-				map.put("flag", 1);
-			}
-			else
-			{
-				throw new Exception("删除失败");
-			}
+			adminService.updateIndexPublication(newPublication);
+			logger.warn("Update publication " + publicationID + " by " + ID);
+			loadPublication();
+			map.put("flag", 1);
 		}
 		catch (Exception e)
 		{
@@ -1124,7 +1048,7 @@ public class AdminController
 		}
 		return map;
 	}
-	
+
 	@RequestMapping("/deletePublicationAjax")
 	@ResponseBody
 	public Object deletePublication(Long publicationID, HttpServletRequest request, HttpServletResponse response)
@@ -1139,17 +1063,10 @@ public class AdminController
 			HttpSession session = request.getSession();
 			Long ID = Long.parseLong(session.getAttribute(GlobelVariable.SESSION_USER_ID).toString());
 
-			Boolean flag = adminService.deleteIndexPublication(publicationID);
-			if (flag)
-			{
-				logger.warn("Delete publication " + publicationID + " by " + ID);
-				loadPublication();
-				map.put("flag", 1);
-			}
-			else
-			{
-				throw new Exception("删除失败");
-			}
+			adminService.deleteIndexPublication(publicationID);
+			logger.warn("Delete publication " + publicationID + " by " + ID);
+			loadPublication();
+			map.put("flag", 1);
 		}
 		catch (Exception e)
 		{
@@ -1158,7 +1075,7 @@ public class AdminController
 		}
 		return map;
 	}
-	
+
 	@RequestMapping("/reloadAjax")
 	@ResponseBody
 	public Object reload(HttpServletRequest request, HttpServletResponse response)
@@ -1168,7 +1085,7 @@ public class AdminController
 		{
 			loadImage();
 			loadTeaching();
-			loadPublication();	
+			loadPublication();
 			loadResearch();
 			map.put("flag", 1);
 		}
@@ -1179,9 +1096,9 @@ public class AdminController
 		}
 		return map;
 	}
-	
-	///首页研究方向
-	
+
+	/// 首页研究方向
+
 	@RequestMapping("/addResearchAjax")
 	@ResponseBody
 	public Object addResearch(IndexResearch research, HttpServletRequest request, HttpServletResponse response)
@@ -1193,7 +1110,7 @@ public class AdminController
 			{
 				throw new Exception("添加论文记录为空");
 			}
-			if(research.getContent()==null||research.getContent().trim().equals(""))
+			if (research.getContent() == null || research.getContent().trim().equals(""))
 			{
 				throw new Exception("详情不能为空");
 			}
@@ -1202,7 +1119,7 @@ public class AdminController
 
 			research.setContent(XSSUtil.cleanXSS(research.getContent()));
 			Long researchID = adminService.addIndexResearch(research);
-			if (researchID!=null)
+			if (researchID != null)
 			{
 				logger.warn("Add research " + researchID + " by " + ID);
 				loadResearch();
@@ -1220,7 +1137,7 @@ public class AdminController
 		}
 		return map;
 	}
-	
+
 	@RequestMapping("/updateResearchAjax")
 	@ResponseBody
 	public Object updateResearch(IndexResearch research, HttpServletRequest request, HttpServletResponse response)
@@ -1232,7 +1149,7 @@ public class AdminController
 			{
 				throw new Exception("更新论文记录为空");
 			}
-			if(research.getContent()==null||research.getContent().trim().equals(""))
+			if (research.getContent() == null || research.getContent().trim().equals(""))
 			{
 				throw new Exception("详情不能为空");
 			}
@@ -1242,17 +1159,11 @@ public class AdminController
 			Long researchID = research.getID();
 			IndexResearch newResearch = adminService.getResearchByID(researchID);
 			newResearch.setContent(XSSUtil.cleanXSS(research.getContent()));
-			Boolean flag = adminService.updateIndexResearch(newResearch);
-			if (flag)
-			{
-				logger.warn("Update research " + researchID + " by " + ID);
-				loadResearch();
-				map.put("flag", 1);
-			}
-			else
-			{
-				throw new Exception("删除失败");
-			}
+			adminService.updateIndexResearch(newResearch);
+			logger.warn("Update research " + researchID + " by " + ID);
+			loadResearch();
+			map.put("flag", 1);
+
 		}
 		catch (Exception e)
 		{
@@ -1261,7 +1172,7 @@ public class AdminController
 		}
 		return map;
 	}
-	
+
 	@RequestMapping("/deleteResearchAjax")
 	@ResponseBody
 	public Object deleteResearch(Long researchID, HttpServletRequest request, HttpServletResponse response)
@@ -1276,17 +1187,11 @@ public class AdminController
 			HttpSession session = request.getSession();
 			Long ID = Long.parseLong(session.getAttribute(GlobelVariable.SESSION_USER_ID).toString());
 
-			Boolean flag = adminService.deleteIndexResearch(researchID);
-			if (flag)
-			{
-				logger.warn("Delete research " + researchID + " by " + ID);
-				loadResearch();
-				map.put("flag", 1);
-			}
-			else
-			{
-				throw new Exception("删除失败");
-			}
+			adminService.deleteIndexResearch(researchID);
+			logger.warn("Delete research " + researchID + " by " + ID);
+			loadResearch();
+			map.put("flag", 1);
+
 		}
 		catch (Exception e)
 		{
@@ -1295,10 +1200,9 @@ public class AdminController
 		}
 		return map;
 	}
-	
+
 	/*
-	 * 首也各种信息加载至application中
-	 * 不同步应该也没问题
+	 * 首也各种信息加载至application中 不同步应该也没问题
 	 */
 	private synchronized void loadImage() throws Exception
 	{
@@ -1306,7 +1210,7 @@ public class AdminController
 		servletContext.setAttribute(GlobelVariable.APPLICATION_IMAGE_PATH, images);
 		servletContext.setAttribute(GlobelVariable.APPLICATION_IMAGE_SIZE, images.size());
 	}
-	
+
 	private synchronized void loadTeaching() throws Exception
 	{
 		List<IndexTeaching> teachings = adminService.getAllTeaching();
@@ -1320,7 +1224,7 @@ public class AdminController
 		servletContext.setAttribute(GlobelVariable.APPLICATION_PUBLICATION_PATH, publications);
 		servletContext.setAttribute(GlobelVariable.APPLICATION_PUBLICATION_SIZE, publications.size());
 	}
-	
+
 	private synchronized void loadResearch() throws Exception
 	{
 		List<IndexResearch> researchs = adminService.getAllResearch();

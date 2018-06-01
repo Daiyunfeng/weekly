@@ -66,15 +66,8 @@ public class CommentController
 			comment.setUser(user);
 			comment.setContent(XSSUtil.cleanXSS(comment.getContent()));
 			comment.setArticle(articleService.findArticle(articleID));
-			Boolean flag = commentService.addComment(comment);
-			if (flag)
-			{
-				map.put("flag", 1);
-			}
-			else
-			{
-				throw new Exception("添加失败");
-			}
+			commentService.addComment(comment);
+			map.put("flag", 1);
 		}
 		catch (Exception e)
 		{

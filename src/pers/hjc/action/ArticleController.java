@@ -191,16 +191,9 @@ public class ArticleController
 			User user = userService.findUser(ID);
 			article.setUser(user);
 			article.setTitle(XSSUtil.cleanXSS(article.getTitle()));
-			Boolean flag = articleService.addArticle(article);
-			if (flag)
-			{
-				map.put("flag", 1);
-				map.put("msg", article.getID());
-			}
-			else
-			{
-				throw new Exception("添加失败");
-			}
+			articleService.addArticle(article);
+			map.put("flag", 1);
+			map.put("msg", article.getID());
 		}
 		catch (Exception e)
 		{
@@ -246,16 +239,9 @@ public class ArticleController
 			ArticleContent content = newArticle.getArticleContent();
 			content.setContent(article.getArticleContent().getContent());
 			newArticle.setArticleContent(content);
-			Boolean flag = articleService.updateArticle(newArticle);
-			if (flag)
-			{
-				map.put("flag", 1);
-				map.put("msg", article.getID());
-			}
-			else
-			{
-				throw new Exception("更新失败");
-			}
+			articleService.updateArticle(newArticle);
+			map.put("flag", 1);
+			map.put("msg", article.getID());
 		}
 		catch (Exception e)
 		{
@@ -290,17 +276,9 @@ public class ArticleController
 				throw new Exception("异常操作");
 			}
 
-			article.setIsUse(0);
-			Boolean flag = articleService.updateArticle(article);
-			if (flag)
-			{
-				logger.warn("Delete Ariticle " + articleID + " by " + ID);
-				map.put("flag", 1);
-			}
-			else
-			{
-				throw new Exception("删除失败");
-			}
+			articleService.deleteArticle(article);
+			logger.warn("Delete Ariticle " + articleID + " by " + ID);
+			map.put("flag", 1);
 		}
 		catch (Exception e)
 		{

@@ -17,6 +17,12 @@ public class PageController
 {
 	private static final Logger logger = LoggerFactory.getLogger(PageController.class);
 
+	@RequestMapping({ "/element" })
+	public String elementListPage(HttpServletRequest request, HttpServletResponse response)
+	{
+		return "element";
+	}
+	
 	@RequestMapping("/errors/error")
 	public String errorPage(HttpServletRequest request, HttpServletResponse response)
 	{
