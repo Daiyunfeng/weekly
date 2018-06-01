@@ -11,18 +11,8 @@ import pers.hjc.dao.UserDao;
 import pers.hjc.model.User;
 
 @Repository
-public class UserDaoImpl implements UserDao
+public class UserDaoImpl extends BaseDaoImpl<User> implements UserDao
 {
-	@Autowired
-	BaseDaoImpl<User> baseDao;
-
-	@Override
-	public User findByUserID(Long userID) throws Exception
-	{
-		User user = null;
-		user = baseDao.get(User.class, userID);
-		return user;
-	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -32,11 +22,11 @@ public class UserDaoImpl implements UserDao
 		param[0] = "realname";
 		if (flag)
 		{
-			return baseDao.find("FROM User ORDER BY ?", param);
+			return find("FROM User ORDER BY ?", param);
 		}
 		else
 		{
-			return baseDao.find("FROM User WHERE isUse = 1 ORDER BY ?", param);
+			return find("FROM User WHERE isUse = 1 ORDER BY ?", param);
 		}
 	}
 
@@ -58,30 +48,12 @@ public class UserDaoImpl implements UserDao
 		param[0] = "realname";
 		if (flag)
 		{
-			return baseDao.find("FROM User ORDER BY ?", page, rows, param);
+			return find("FROM User ORDER BY ?", page, rows, param);
 		}
 		else
 		{
-			return baseDao.find("FROM User WHERE isUse = 1 ORDER BY ?", page, rows, param);
+			return find("FROM User WHERE isUse = 1 ORDER BY ?", page, rows, param);
 		}
-	}
-
-	@Override
-	public Boolean addUser(User user) throws Exception
-	{
-		Serializable userID = baseDao.save(user);
-		if (userID == null)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public Boolean updateUser(User user) throws Exception
-	{
-		baseDao.update(user);
-		return true;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -95,7 +67,7 @@ public class UserDaoImpl implements UserDao
 			param[0] = realname;
 			param[1] = 1;
 			param[2] = "realname";
-			List<User> users = baseDao.find(hql, param);
+			List<User> users = find(hql, param);
 			return users;
 		}
 		else
@@ -104,7 +76,7 @@ public class UserDaoImpl implements UserDao
 			Object[] param = new Object[2];
 			param[0] = realname;
 			param[1] = "realname";
-			List<User> users = baseDao.find(hql, param);
+			List<User> users = find(hql, param);
 			return users;
 		}
 	}
@@ -117,11 +89,11 @@ public class UserDaoImpl implements UserDao
 		{
 			if (flag)
 			{
-				return baseDao.find("FROM User", null);
+				return find("FROM User", null);
 			}
 			else
 			{
-				return baseDao.find("FROM User WHERE isUse = 1", null);
+				return find("FROM User WHERE isUse = 1", null);
 			}
 		}
 		StringBuilder hql = new StringBuilder("FROM User WHERE ");
@@ -147,7 +119,7 @@ public class UserDaoImpl implements UserDao
 		}
 		if (flag)
 		{
-			return baseDao.find(hql.toString(), param);
+			return find(hql.toString(), param);
 		}
 		else
 		{
@@ -159,7 +131,7 @@ public class UserDaoImpl implements UserDao
 			{
 				hql.append("isUse = 1");
 			}
-			return baseDao.find(hql.toString(), param);
+			return find(hql.toString(), param);
 		}
 	}
 }

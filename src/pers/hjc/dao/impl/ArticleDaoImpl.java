@@ -1,11 +1,9 @@
 package pers.hjc.dao.impl;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import pers.hjc.dao.ArticleDao;
@@ -13,29 +11,8 @@ import pers.hjc.model.Article;
 
 @SuppressWarnings("unchecked")
 @Repository
-public class ArticleDaoImpl implements ArticleDao
+public class ArticleDaoImpl extends BaseDaoImpl<Article> implements ArticleDao
 {
-	@Autowired
-	BaseDaoImpl<Article> baseDao;
-
-	@Override
-	public Boolean addArticle(Article article) throws Exception
-	{
-		Serializable articleID = baseDao.save(article);
-		if (articleID == null)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public Article findByArticleID(Long articleID) throws Exception
-	{
-		Article article = null;
-		article = baseDao.get(Article.class, articleID);
-		return article;
-	}
 
 	@Override
 	public List<Article> findAllArticle(Boolean flag, String orderBy) throws Exception
@@ -44,11 +21,11 @@ public class ArticleDaoImpl implements ArticleDao
 		param[0] = orderBy;
 		if (flag)
 		{
-			return baseDao.find("FROM Article ORDER BY ?", param);
+			return find("FROM Article ORDER BY ?", param);
 		}
 		else
 		{
-			return baseDao.find("FROM Article WHERE isUse = 1 ORDER BY ?", param);
+			return find("FROM Article WHERE isUse = 1 ORDER BY ?", param);
 		}
 	}
 
@@ -59,19 +36,12 @@ public class ArticleDaoImpl implements ArticleDao
 		param[0] = orderBy;
 		if (flag)
 		{
-			return baseDao.find("FROM Article ORDER BY ?", page, rows, param);
+			return find("FROM Article ORDER BY ?", page, rows, param);
 		}
 		else
 		{
-			return baseDao.find("FROM Article WHERE isUse = 1 ORDER BY ?", page, rows, param);
+			return find("FROM Article WHERE isUse = 1 ORDER BY ?", page, rows, param);
 		}
-	}
-
-	@Override
-	public Boolean updateArticle(Article Article) throws Exception
-	{
-		baseDao.update(Article);
-		return true;
 	}
 
 	@Override
@@ -84,11 +54,11 @@ public class ArticleDaoImpl implements ArticleDao
 		param[2] = orderBy;
 		if (flag)
 		{
-			return baseDao.find("FROM Article WhERE updateTime BETWEEN ? AND ? ORDER BY ?", param);
+			return find("FROM Article WhERE updateTime BETWEEN ? AND ? ORDER BY ?", param);
 		}
 		else
 		{
-			return baseDao.find("FROM Article WHERE updateTime BETWEEN ? AND ? AND isUse = 1 ORDER BY ?", param);
+			return find("FROM Article WHERE updateTime BETWEEN ? AND ? AND isUse = 1 ORDER BY ?", param);
 		}
 	}
 
@@ -102,11 +72,11 @@ public class ArticleDaoImpl implements ArticleDao
 		param[2] = orderBy;
 		if (flag)
 		{
-			return baseDao.find("FROM Article WHERE updateTime BETWEEN ? AND ? ORDER BY ?", page, rows, param);
+			return find("FROM Article WHERE updateTime BETWEEN ? AND ? ORDER BY ?", page, rows, param);
 		}
 		else
 		{
-			return baseDao.find("FROM Article WHERE updateTime BETWEEN ? AND ? AND isUse = 1 ORDER BY ?", page, rows,
+			return find("FROM Article WHERE updateTime BETWEEN ? AND ? AND isUse = 1 ORDER BY ?", page, rows,
 					param);
 		}
 	}
@@ -120,11 +90,11 @@ public class ArticleDaoImpl implements ArticleDao
 		param[1] = orderBy;
 		if (flag)
 		{
-			return baseDao.find("FROM Article WHERE title = ? ORDER BY ?", page, rows, param);
+			return find("FROM Article WHERE title = ? ORDER BY ?", page, rows, param);
 		}
 		else
 		{
-			return baseDao.find("FROM Article WHERE title = ? AND isUse = 1 ORDER BY ?", page, rows, param);
+			return find("FROM Article WHERE title = ? AND isUse = 1 ORDER BY ?", page, rows, param);
 		}
 	}
 
@@ -135,11 +105,11 @@ public class ArticleDaoImpl implements ArticleDao
 		param[0] = 1;
 		if (flag)
 		{
-			return baseDao.count("FROM Article", param).intValue();
+			return count("FROM Article", param).intValue();
 		}
 		else
 		{
-			return baseDao.count("FROM Article WHERE isUse = ?", param).intValue();
+			return count("FROM Article WHERE isUse = ?", param).intValue();
 		}
 	}
 
@@ -151,11 +121,11 @@ public class ArticleDaoImpl implements ArticleDao
 		{
 			if (flag)
 			{
-				return baseDao.find("FROM Article", null);
+				return find("FROM Article", null);
 			}
 			else
 			{
-				return baseDao.find("FROM Article WHERE isUse = 1", null);
+				return find("FROM Article WHERE isUse = 1", null);
 			}
 		}
 		StringBuilder hql = new StringBuilder("FROM Article WHERE ");
@@ -212,7 +182,7 @@ public class ArticleDaoImpl implements ArticleDao
 		}
 		if (flag)
 		{
-			return baseDao.find(hql.toString(), param);
+			return find(hql.toString(), param);
 		}
 		else
 		{
@@ -224,8 +194,12 @@ public class ArticleDaoImpl implements ArticleDao
 			{
 				hql.append("isUse = 1");
 			}
-			return baseDao.find(hql.toString(), param);
+			return find(hql.toString(), param);
 		}
 	}
-
+	public void deleteArticle(Article article) throws Exception
+	{
+		article.setIsUse(0);
+		update(article);
+	}
 }

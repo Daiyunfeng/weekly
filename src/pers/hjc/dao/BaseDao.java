@@ -83,8 +83,8 @@ public interface BaseDao<T>
 	 *            对象ID
 	 * @return Object
 	 */
-	public T get(Class<T> c, Serializable id) throws Exception;
-
+	public T getById(Serializable id) throws Exception;
+	
 	/**
 	 * select count(1) from 类
 	 * 

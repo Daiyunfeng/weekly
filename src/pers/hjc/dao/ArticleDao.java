@@ -6,10 +6,8 @@ import java.util.Map;
 
 import pers.hjc.model.Article;
 
-public interface ArticleDao
+public interface ArticleDao extends BaseDao<Article>
 {
-	Article findByArticleID(Long articleID) throws Exception;
-
 	List<Article> findAllArticle(Boolean flag, String orderBy) throws Exception;
 
 	List<Article> findArticleByPage(Integer page, Integer rows, Boolean flag, String orderBy) throws Exception;
@@ -24,9 +22,7 @@ public interface ArticleDao
 
 	List<Article> searchArticle(Map<String, Object> params, Boolean flag) throws Exception;
 
-	Boolean addArticle(Article article) throws Exception;
-
-	Boolean updateArticle(Article Article) throws Exception;
-
 	int count(Boolean flag) throws Exception;
+	
+	void deleteArticle(Article article) throws Exception;
 }

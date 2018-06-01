@@ -5,10 +5,8 @@ import java.util.Map;
 
 import pers.hjc.model.User;
 
-public interface UserDao
+public interface UserDao extends BaseDao<User>
 {
-	User findByUserID(Long userID) throws Exception;
-
 	List<User> findByRealname(String realname, Boolean flag) throws Exception;
 
 	/**
@@ -36,8 +34,4 @@ public interface UserDao
 	List<User> findUserByPage(Integer page, Integer rows, Boolean flag) throws Exception;
 
 	List<User> searchUser(Map<String, Object> params, Boolean flag) throws Exception;
-
-	Boolean addUser(User user) throws Exception;
-
-	Boolean updateUser(User user) throws Exception;
 }

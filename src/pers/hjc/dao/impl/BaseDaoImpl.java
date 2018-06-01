@@ -1,6 +1,7 @@
 package pers.hjc.dao.impl;
 
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,7 +13,6 @@ import org.hibernate.jdbc.Work;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import pers.hjc.dao.BaseDao;
 
@@ -21,14 +21,20 @@ import pers.hjc.dao.BaseDao;
  * 
  * @author CXD
  */
-@Repository
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class BaseDaoImpl<T> implements BaseDao<T>
 {
-
+	private Class<T> clazz;  
+	
 	@Autowired
 	SessionFactory sessionFactory;
 
+	public BaseDaoImpl() 
+	{  
+        ParameterizedType type = (ParameterizedType) this.getClass().getGenericSuperclass();  
+        clazz = (Class<T>) type.getActualTypeArguments()[0];  
+    }  
+	
 	@Override
 	public Serializable save(T o) throws Exception
 	{
@@ -125,9 +131,9 @@ public class BaseDaoImpl<T> implements BaseDao<T>
 	}
 
 	@Override
-	public T get(Class<T> c, Serializable id) throws Exception
+	public T getById(Serializable id) throws Exception
 	{
-		return (T) sessionFactory.getCurrentSession().get(c, id);
+		return (T) sessionFactory.getCurrentSession().get(this.clazz, id);
 	}
 
 	@Override
