@@ -8,18 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import pers.hjc.dao.impl.ArticleDaoImpl;
-import pers.hjc.model.Article;
+import pers.hjc.dao.ArticleDao;
 import pers.hjc.model.Article;
 
 @Service
 public class ArticleService
 {
 	@Autowired
-	private ArticleDaoImpl articleDao;
+	private ArticleDao articleDao;
 
 	@Transactional(readOnly = false)
-	public Boolean addArticle(Article article) throws Exception
+	public void addArticle(Article article) throws Exception
 	{
 		// Date date = new Date(System.currentTimeMillis());
 		// article.setUpdateTime(date);
@@ -27,12 +26,11 @@ public class ArticleService
 		{
 			throw new Exception("内容不能为空");
 		}
-		Boolean flag = articleDao.addArticle(article);
-		return flag;
+		articleDao.save(article);
 	}
 
 	@Transactional(readOnly = false)
-	public Boolean updateArticle(Article article) throws Exception
+	public void updateArticle(Article article) throws Exception
 	{
 		Date date = new Date(System.currentTimeMillis());
 		article.setUpdateTime(date);
@@ -40,14 +38,13 @@ public class ArticleService
 		{
 			throw new Exception("内容不能为空");
 		}
-		Boolean flag = articleDao.updateArticle(article);
-		return flag;
+		articleDao.update(article);
 	}
 
 	@Transactional(readOnly = true)
 	public Article findArticle(Long articleID) throws Exception
 	{
-		Article article = articleDao.findByArticleID(articleID);
+		Article article = articleDao.getById(articleID);
 		return article;
 	}
 
@@ -125,5 +122,11 @@ public class ArticleService
 			return "user.realname";
 		}
 		return "updateTime";
+	}
+
+	public void deleteArticle(Article article) throws Exception
+	{
+		// TODO Auto-generated method stub
+		articleDao.deleteArticle(article);
 	}
 }

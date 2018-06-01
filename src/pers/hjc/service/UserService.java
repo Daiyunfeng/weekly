@@ -28,13 +28,13 @@ public class UserService
 
 	@Autowired
 	private IndexUserDao indexUserDao;
-	
+
 	@SuppressWarnings("rawtypes")
 	@Transactional(readOnly = true)
-	public User login(Map map, LoginMessage loginMessage) throws Exception
+	public User login(LoginMessage loginMessage) throws Exception
 	{
 		Long userID = loginMessage.getUserID();
-		User user = userDao.findByUserID(userID);
+		User user = userDao.getById(userID);
 		if (user != null)
 		{
 			if (user.getIsUse() == 1)
@@ -70,7 +70,7 @@ public class UserService
 	@Transactional(readOnly = true)
 	public User findUser(Long userID) throws Exception
 	{
-		User user = userDao.findByUserID(userID);
+		User user = userDao.getById(userID);
 		return user;
 	}
 
@@ -114,14 +114,14 @@ public class UserService
 	}
 
 	@Transactional(readOnly = false)
-	public Boolean registerUser(User user) throws Exception
+	public void registerUser(User user) throws Exception
 	{
 		User tmp = this.findUser(user.getID());
 		if (tmp == null)
 		{
 			user.setPassword(MD5Util.generate(user.getPassword()));
-			user.setRole(roleDao.findRole(GlobelVariable.STUDENT_ROLE));
-			return userDao.addUser(user);
+			user.setRole(roleDao.getById(GlobelVariable.STUDENT_ROLE));
+			userDao.save(user);
 		}
 		else
 		{
@@ -130,9 +130,9 @@ public class UserService
 	}
 
 	@Transactional(readOnly = false)
-	public Boolean updateUser(User user) throws Exception
+	public void updateUser(User user) throws Exception
 	{
-		return userDao.updateUser(user);
+		userDao.update(user);
 	}
 
 	@Transactional(readOnly = true)
@@ -146,11 +146,11 @@ public class UserService
 	{
 		return indexUserDao.findAllUser();
 	}
-	
+
 	@Transactional(readOnly = true)
 	public Role findRole(Long id) throws Exception
 	{
-		return roleDao.findRole(id);
+		return roleDao.getById(id);
 	}
 	/*
 	 * @Transactional(readOnly = true) public List<User>

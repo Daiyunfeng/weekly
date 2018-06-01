@@ -25,18 +25,18 @@ public class CommentService
 	private ArticleService articleService;
 
 	@Transactional(readOnly = false)
-	public Boolean addComment(Comment comment) throws Exception
+	public void addComment(Comment comment) throws Exception
 	{
-		return commentDao.addComment(comment);
+		commentDao.save(comment);
 	}
 
 	@Transactional(readOnly = false)
-	public Boolean deleteComment(Long ID) throws Exception
+	public void deleteComment(Long ID) throws Exception
 	{
-		Comment comment = commentDao.findByCommentID(ID);
+		Comment comment = commentDao.getById(ID);
 		if (comment != null)
 		{
-			return commentDao.deleteComment(comment);
+			commentDao.deleteComment(comment);
 		}
 		else
 		{

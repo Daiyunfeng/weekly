@@ -41,15 +41,14 @@ public class AdminService
 	private IndexResearchDao indexResearchDao;
 
 	@Transactional(readOnly = false)
-	public Boolean deleteImage(Long imageID) throws Exception
+	public void deleteImage(Long imageID) throws Exception
 	{
-		IndexImage image = imageDao.findImage(imageID);
+		IndexImage image = imageDao.getById(imageID);
 		if (image == null)
 		{
 			throw new Exception("图片不存在");
 		}
-		imageDao.deleteImage(image);
-		return true;
+		imageDao.delete(image);
 	}
 
 	@Transactional(readOnly = true)
@@ -61,20 +60,19 @@ public class AdminService
 	@Transactional(readOnly = true)
 	public IndexImage getImageByID(Long ID) throws Exception
 	{
-		return imageDao.findImage(ID);
+		return imageDao.getById(ID);
 	}
 
 	@Transactional(readOnly = false)
-	public Boolean updateImage(IndexImage image) throws Exception
+	public void updateImage(IndexImage image) throws Exception
 	{
-		imageDao.updateImage(image);
-		return true;
+		imageDao.update(image);
 	}
 
 	@Transactional(readOnly = false)
 	public Long addImage(IndexImage image) throws Exception
 	{
-		Serializable imageID = imageDao.addImage(image);
+		Serializable imageID = imageDao.save(image);
 		if (imageID == null)
 		{
 			throw new Exception("添加首页图片失败" + image.getID() + "    " + image.getImage() + "    " + image.getTitle() + "    "
@@ -86,20 +84,19 @@ public class AdminService
 	@Transactional(readOnly = true)
 	public IndexUser getIndexUserByID(Long ID) throws Exception
 	{
-		return indexUserDao.findUser(ID);
+		return indexUserDao.getById(ID);
 	}
 
 	@Transactional(readOnly = false)
-	public Boolean updateIndexUser(IndexUser user) throws Exception
+	public void updateIndexUser(IndexUser user) throws Exception
 	{
-		indexUserDao.updateUser(user);
-		return true;
+		indexUserDao.update(user);
 	}
 	
 	@Transactional(readOnly = false)
 	public void addUser(IndexUser user) throws Exception
 	{
-		Serializable userID = indexUserDao.addUser(user);
+		Serializable userID = indexUserDao.save(user);
 		if (userID == null)
 		{
 			throw new Exception("添加首页用户失败");
@@ -107,15 +104,14 @@ public class AdminService
 	}
 	
 	@Transactional(readOnly = false)
-	public Boolean deleteIndexUser(Long userID) throws Exception
+	public void deleteIndexUser(Long userID) throws Exception
 	{
-		IndexUser user = indexUserDao.findUser(userID);
+		IndexUser user = indexUserDao.getById(userID);
 		if (user == null)
 		{
 			throw new Exception("首页用户不存在");
 		}
-		indexUserDao.deleteUser(user);
-		return true;
+		indexUserDao.delete(user);
 	}
 	
 	@Transactional(readOnly = true)
@@ -127,20 +123,19 @@ public class AdminService
 	@Transactional(readOnly = true)
 	public IndexTeaching getTeachingByID(Long ID) throws Exception
 	{
-		return indexTeachingDao.findTeaching(ID);
+		return indexTeachingDao.getById(ID);
 	}
 
 	@Transactional(readOnly = false)
-	public Boolean updateIndexTeaching(IndexTeaching teaching) throws Exception
+	public void updateIndexTeaching(IndexTeaching teaching) throws Exception
 	{
-		indexTeachingDao.updateTeaching(teaching);
-		return true;
+		indexTeachingDao.update(teaching);
 	}
 	
 	@Transactional(readOnly = false)
 	public Long addIndexTeaching(IndexTeaching teaching) throws Exception
 	{
-		Serializable teachingID = indexTeachingDao.addTeaching(teaching);
+		Serializable teachingID = indexTeachingDao.save(teaching);
 		if (teachingID == null)
 		{
 			throw new Exception("添加教学记录失败");
@@ -149,16 +144,14 @@ public class AdminService
 	}
 	
 	@Transactional(readOnly = false)
-	public Boolean deleteIndexTeaching(Long teachingID) throws Exception
+	public void deleteIndexTeaching(Long teachingID) throws Exception
 	{
-		IndexTeaching teaching = indexTeachingDao.findTeaching(teachingID);
+		IndexTeaching teaching = indexTeachingDao.getById(teachingID);
 		if (teaching == null)
 		{
 			throw new Exception("此条教学记录不存在");
 		}
-		teaching.setIsUse(0);
-		indexTeachingDao.updateTeaching(teaching);
-		return true;
+		indexTeachingDao.delete(teaching);
 	}
 	
 	@Transactional(readOnly = true)
@@ -170,20 +163,19 @@ public class AdminService
 	@Transactional(readOnly = true)
 	public IndexPublication getPublicationByID(Long ID) throws Exception
 	{
-		return indexPublicationDao.findPublication(ID);
+		return indexPublicationDao.getById(ID);
 	}
 
 	@Transactional(readOnly = false)
-	public Boolean updateIndexPublication(IndexPublication publication) throws Exception
+	public void updateIndexPublication(IndexPublication publication) throws Exception
 	{
-		indexPublicationDao.updatePublication(publication);
-		return true;
+		indexPublicationDao.update(publication);
 	}
 	
 	@Transactional(readOnly = false)
 	public Long addIndexPublication(IndexPublication publication) throws Exception
 	{
-		Serializable publicationID = indexPublicationDao.addPublication(publication);
+		Serializable publicationID = indexPublicationDao.save(publication);
 		if (publicationID == null)
 		{
 			throw new Exception("添加发表论文失败");
@@ -192,16 +184,14 @@ public class AdminService
 	}
 	
 	@Transactional(readOnly = false)
-	public Boolean deleteIndexPublication(Long publicationID) throws Exception
+	public void deleteIndexPublication(Long publicationID) throws Exception
 	{
-		IndexPublication publication = indexPublicationDao.findPublication(publicationID);
+		IndexPublication publication = indexPublicationDao.getById(publicationID);
 		if (publication == null)
 		{
 			throw new Exception("此条发表论文不存在");
 		}
-		publication.setIsUse(0);
-		indexPublicationDao.updatePublication(publication);
-		return true;
+		indexPublicationDao.delete(publication);
 	}
 	
 	@Transactional(readOnly = true)
@@ -213,20 +203,19 @@ public class AdminService
 	@Transactional(readOnly = true)
 	public IndexResearch getResearchByID(Long ID) throws Exception
 	{
-		return indexResearchDao.findResearch(ID);
+		return indexResearchDao.getById(ID);
 	}
 
 	@Transactional(readOnly = false)
-	public Boolean updateIndexResearch(IndexResearch research) throws Exception
+	public void updateIndexResearch(IndexResearch research) throws Exception
 	{
-		indexResearchDao.updateResearch(research);
-		return true;
+		indexResearchDao.update(research);
 	}
 	
 	@Transactional(readOnly = false)
 	public Long addIndexResearch(IndexResearch research) throws Exception
 	{
-		Serializable researchID = indexResearchDao.addResearch(research);
+		Serializable researchID = indexResearchDao.save(research);
 		if (researchID == null)
 		{
 			throw new Exception("添加研究方向失败");
@@ -235,15 +224,13 @@ public class AdminService
 	}
 	
 	@Transactional(readOnly = false)
-	public Boolean deleteIndexResearch(Long researchID) throws Exception
+	public void deleteIndexResearch(Long researchID) throws Exception
 	{
-		IndexResearch research = indexResearchDao.findResearch(researchID);
+		IndexResearch research = indexResearchDao.getById(researchID);
 		if (research == null)
 		{
 			throw new Exception("此条研究方向不存在");
 		}
-		research.setIsUse(0);
-		indexResearchDao.updateResearch(research);
-		return true;
+		indexResearchDao.delete(research);
 	}
 }
